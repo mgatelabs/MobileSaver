@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Steam Deck Screensaver</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    button {
+      font-size: 2em;
+      padding: 1em 2em;
+      border-radius: 10px;
+      border: none;
+      background: lime;
+      color: black;
+      cursor: pointer;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <button id="startBtn0">Square</button>
+  &nbsp;
+  <button id="startBtn1">DVD</button>
+  <canvas id="screen"></canvas>
+
+  <script>
+    const canvas = document.getElementById("screen");
+    const ctx = canvas.getContext("2d");
+    const button0 = document.getElementById("startBtn0");
+    const button1 = document.getElementById("startBtn1");
+    let width, height;
+    let x = 100, y = 100, dx = 2, dy = 2;
+    let animationFrame;
+    let allowExit = false;
+    let wakeLock = null;
+    
+    let selectedMode = 1;
+    
+    let imageWidth = 50;
+    let imageHeight = 50;
+    
+    const img = new Image();
+    
+    const cursors = [
+        "default", "pointer", "crosshair", "wait",
+        "text", "move", "progress", "not-allowed"
+    ];
+
+    let cursorIndex = 0;
+    let cursorInterval;
+    
+    let currentColor = "lime";
+    const colors = ["lime", "red", "blue", "yellow", "magenta", "cyan", "white", "orange"];
+    let colorIndex = 0;
+    let colorInterval;
+
+    function startColorCycle() {
+      colorInterval = setInterval(() => {
+        colorIndex = (colorIndex + 1) % colors.length;
+        currentColor = colors[colorIndex];
+      }, 3000); // Change every 3 seconds
+    }
+
+    function stopColorCycle() {
+      clearInterval(colorInterval);
+      currentColor = "lime";
+    }
+    
+    function startCursorCycle() {
+      cursorInterval = setInterval(() => {
+        cursorIndex = (cursorIndex + 1) % cursors.length;
+        canvas.style.cursor = cursors[cursorIndex];
+      }, 3000); // change every 3 seconds
+    }
+
+    function stopCursorCycle() {
+      clearInterval(cursorInterval);
+      canvas.style.cursor = "default";
+    }
+    
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = currentColor;
+      ctx.fillRect(x, y, imageWidth, imageHeight);
+      
+      if (selectedMode == 1) {
+        if (img.complete) {
+          ctx.drawImage(img, x, y, imageWidth, imageHeight);
+        }
+      }
+      
+
+      x += dx;
+      y += dy;
+
+      if (x + imageWidth > width || x < 0) dx *= -1;
+      if (y + imageHeight > height || y < 0) dy *= -1;
+
+      animationFrame = requestAnimationFrame(draw);
+    }
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => {
+            console.log('Wake Lock released');
+          });
+          console.log('Wake Lock active');
+        } else {
+          console.warn('Wake Lock not supported');
+        }
+      } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock) {
+        wakeLock.release();
+        wakeLock = null;
+      }
+    }
+	
+	function enterSquare() {
+		selectedMode = 0;
+		enterFullscreen();
+	}
+	
+	function enterDvd() {
+		selectedMode = 1;
+		enterFullscreen();
+	}
+	
+    async function enterFullscreen() {
+      try {
+        await document.documentElement.requestFullscreen();
+        await requestWakeLock();
+        
+        if (selectedMode == 0) {
+            imageWidth = 50;
+            imageHeight = 50;
+        } else if (selectedMode == 1) {
+            imageWidth = 256;
+            imageHeight = 156;
+            img.src = "./images/dvdlogo.png";
+        }
+        
+        
+        resize();
+        canvas.style.display = 'block';
+        button0.style.display = 'none';
+        button1.style.display = 'none';
+        allowExit = false;
+        setTimeout(() => allowExit = true, 1000);
+		startColorCycle();
+        draw();
+        startCursorCycle(); // start rotating cursors
+      } catch (e) {
+        console.error("Failed to enter fullscreen:", e);
+      }
+    }
+
+    function exitFullscreen() {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    }
+
+    function stopScreensaver() {
+      cancelAnimationFrame(animationFrame);
+      canvas.style.display = 'none';
+      releaseWakeLock();
+      button0.style.display = 'block';
+      button1.style.display = 'block';
+      stopCursorCycle(); // reset cursor	  
+	  stopColorCycle();
+    }
+
+    canvas.addEventListener("click", () => {
+      if (allowExit) {
+        exitFullscreen();
+      }
+    });
+    
+    // Listen for the click event
+    button0.addEventListener("click", enterSquare);
+    button1.addEventListener("click", enterDvd);
+
+    // Resize when the window changes size
+    window.addEventListener("resize", () => {
+      if (document.fullscreenElement) resize();
+    });
+    
+    // Listen for Exit Full screen
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement) {
+        stopScreensaver();
+      }
+    });
+  </script>
+</body>
+</html>
