@@ -417,9 +417,9 @@ class Flyer {
 
     if (this.speedLimit) {
       if (this.itemType == 0) {
-        this.delayFrames = randomInt(6, 12); // 1–3 sec delay
+        this.delayFrames = randomInt(4, 8); // 1–3 sec delay
       } else {
-        this.delayFrames = randomInt(13, 23);
+        this.delayFrames = randomInt(8, 16);
       }
     } else {
       this.delayFrames = randomInt(2, 4);
@@ -427,9 +427,9 @@ class Flyer {
 
     if (Math.random() * 5 > 2.25) {
       this.startX = -350;
-      this.startY = Math.random() * canvas.height;
+      this.startY = (Math.random() * ((canvas.height * 0.90) + 350)) - 350;
     } else {
-      this.startX = Math.random() * canvas.width;
+      this.startX = (Math.random() * ((canvas.width * 0.90) + 350)) - 350;
       this.startY = -350;
     }
 
