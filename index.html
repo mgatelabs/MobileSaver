@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <title>Steam Deck Screensaver</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Flying Steam Deck: Screen Saver And Keep Awake</title>
+  <script src="./lib/jquery-3.7.1.slim.min.js"></script>
+  <link rel="stylesheet" href="./css/screensaver.css">
 
   <link rel="apple-touch-icon" sizes="57x57" href="./icons/apple-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="60x60" href="./icons/apple-icon-60x60.png">
@@ -14,7 +16,7 @@
   <link rel="apple-touch-icon" sizes="144x144" href="./icons/apple-icon-144x144.png">
   <link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-icon-152x152.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-icon-180x180.png">
-  <link rel="icon" type="image/png" sizes="192x192"  href="./icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/android-icon-192x192.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="96x96" href="./icons/favicon-96x96.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16x16.png">
@@ -24,31 +26,45 @@
   <meta name="theme-color" content="#ffffff">
 
 </head>
+
 <body>
 
   <div id="button-panel">
-    <h1>Steam Deck (Web Based) Screen Saver &amp; Keep Alive</h1>
+    <h1>Steam Deck Screen Saver / Keep Awake App</h1>
     <h3>By Michael Fuller</h3>
-    <h4><a href="https://github.com/mgatelabs/MobileSaver">Source Code</a></h4>
+    <h4><a href="https://github.com/mgatelabs/MobileSaver">Source Code</a>, <a href="./wallpaper.html">Wallpaper Version</a></h4>
 
-    <button id="startBtn2">Flying Steam Decks</button>
-  <button id="startBtn2a">Flying Steam Decks Extreme</button>
+    <div id="controls">
 
-<button id="startBtn1">1 DVD Logo</button>
-  <button id="startBtn1a">2 DVD Logo</button>
-  <button id="startBtn1b">Many DVD Logo</button>
+      <div class="label">Screensaver Type</div>
+      <select id="screenSaverType">
+        <option value="sd" selected>Flying Steam Deck</option>
+        <option value="dvd">DVD Video</option>
+        <option value="box">Boxes</option>
+      </select>
 
-    <button id="startBtn0">One Square</button>
-    <button id="startBtn0a">Two Squares</button>
-    <button id="startBtn0b">Many Squares</button>
-  
-  
+      <div class="label">Crowd Size</div>
+      <select id="screenSaverCrowd">
+        <option value="d" selected>Default</option>
+        <option value="s">Small</option>
+        <option value="m">Medium</option>
+        <option value="l">Large</option>
+        <option value="xl">X-Large</option>
+      </select>
+
+      <div>
+        <button id="start">Start Screen/Awake Saver</button>
+      </div>
+    </div>
 
   </div>
 
-  
+
   <canvas id="screen"></canvas>
 
-  <script src="logic.js"></script>
+  <script src="./js/items.js"></script>
+  <script src="./js/common.js"></script>
+  <script src="./js/screensaver.js"></script>
 </body>
+
 </html>

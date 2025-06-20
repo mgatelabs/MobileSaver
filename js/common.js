@@ -9,6 +9,7 @@
     MG.common.ctx = MG.common.canvas.getContext("2d");
     MG.common.colors = ["lime", "red", "blue", "yellow", "magenta", "cyan", "white", "orange"];
     MG.common.items = [];
+    MG.common.animationFrame = undefined;
 
     let lastTime = 0;
 
@@ -41,7 +42,7 @@
             item.draw(MG.common.ctx);
         }
 
-        animationFrame = requestAnimationFrame(MG.common.drawMethod);
+        MG.common.animationFrame = requestAnimationFrame(MG.common.drawMethod);
     };
 
     MG.common.resetForChange = function() {

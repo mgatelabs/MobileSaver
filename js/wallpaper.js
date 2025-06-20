@@ -31,21 +31,16 @@ window.livelyPropertyListener = function (name, val) {
             contentType = val;
 
             if (started) {
-            init();
-            MG.common.resetForChange();
+                init();
+                MG.common.resetForChange();
             }
-
-            //resetScene(contentType, itemCount); // re-init based on type
             break;
         case "ItemCount":
             itemCount = val;
-
             if (started) {
                 init();
                 MG.common.resetForChange();
             }
-
-            //resetScene(contentType, itemCount); // re-init based on count
             break;
     }
 };
@@ -62,5 +57,4 @@ $(function () {
     started = true;
 
     MG.common.startDrawing();
-
 });
