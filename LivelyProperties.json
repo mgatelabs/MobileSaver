@@ -1,0 +1,16 @@
+{
+    "ContentType": {
+      "text": "Content Type",
+      "type": "dropdown",
+      "items": ["Steam Decks", "DVD Video", "Blocks"],
+      "value": 0
+    },
+    "ItemCount": {
+      "text": "Number of Items",
+      "type": "slider",
+      "min": 1,
+      "step": 1,
+      "max": 100,
+      "value": 12
+    }
+  }
