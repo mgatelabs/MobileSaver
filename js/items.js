@@ -30,6 +30,10 @@
     }
   };
 
+  /**
+   * Simple Bouncing Box
+   */
+
   MG.clz.BouncingBox = class extends MG.clz.BaseBox {
 
     constructor(canvas) {
@@ -67,7 +71,7 @@
       this.colorTimer -= diffSec;
       if (this.colorTimer < 0) {
         this.colorIndex += 1;
-        if (this.colorIndex > MG.colors.length) {
+        if (this.colorIndex > MG.common.colors.length) {
           this.colorIndex = 0;
         }
         this.colorTimer = Math.floor(Math.random() * (30 - 12 + 1)) + 12;
@@ -82,14 +86,16 @@
 
   }
 
+  /**
+   * DVD Video Logos
+   */
+
   MG.clz.DvdLogo = class extends MG.clz.BaseBox {
 
     constructor(canvas) {
-      super(canvas, 256, 156);
+      super(canvas, 256, 154);
       this.img = undefined;
       this.colorTimer = Math.floor(Math.random() * (30 - 12 + 1)) + 12;
-      //this.reset();
-
     }
 
     reset(canvasWidth = 0, canvasHeight = 0) {
@@ -106,11 +112,11 @@
       this.x = Math.random() * (this.rightBound);
       this.y = Math.random() * (this.bottomBound);
 
-      this.colorIndex = MG.common.randomInt(0, MG.common.colors.length - 1);
+      this.colorIndex = MG.common.randomInt(0, 7);
     }
 
     requestImage() {
-      return "./images/dvdlogo.webp";
+      return "./images/dvdlogos.webp";
     }
 
     acceptImage(image) {
@@ -127,23 +133,20 @@
 
       this.colorTimer -= diffSec;
       if (this.colorTimer < 0) {
-        this.colorIndex += 1;
-        if (this.colorIndex > MG.common.colors.length) {
-          this.colorIndex = 0;
-        }
+        this.colorIndex = MG.common.randomInt(0, 7);;
         this.colorTimer = Math.floor(Math.random() * (30 - 12 + 1)) + 12;
       }
 
     }
 
     draw(ctx) {
-      ctx.fillStyle = MG.common.colors[this.colorIndex];
-      ctx.fillRect(this.x + 1, this.y + 1, this.w - 2, this.h - 2);
-
       if (this.img && this.img.complete) {
-        ctx.drawImage(this.img, this.x, this.y, this.w, this.h);
+        if (this.colorIndex < 4) {
+          ctx.drawImage(this.img, 1 + this.colorIndex + ((this.colorIndex) * this.w), 1, this.w, this.h, this.x, this.y, this.w, this.h);
+        } else {
+          ctx.drawImage(this.img, 1 + (this.colorIndex - 4) + ((this.colorIndex - 4) * this.w), 156, this.w, this.h, this.x, this.y, this.w, this.h);
+        }
       }
-
     }
 
   }
@@ -153,7 +156,6 @@
       super(canvas, 300, 300);
       this.itemType = itemType;
       this.speedLimit = speedLimit;
-      //this.reset(true); // true to avoid delay at very first launch
     }
 
     reset(canvasWidth = 0, canvasHeight = 0, skipDelay = false) {
