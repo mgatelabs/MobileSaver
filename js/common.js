@@ -111,7 +111,7 @@
         const dy = y2 - y1;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < (distancePerSecond / 4)) {
+        if (distance < (distancePerSecond / 16)) {
             // Already at the target
             resultObj.x = x1;
             resultObj.y = y1;

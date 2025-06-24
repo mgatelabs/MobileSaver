@@ -274,15 +274,18 @@
 
   class TextBubble extends BasicPoint {
 
-    constructor() {
+    constructor(index) {
       super();
       this.text = '';
       this.text_width = 0;
+      this.index = index;
+      this.bro = -1;
     }
 
   }
 
-  let ntf_strings_calculated = false;
+  let ntf_strings_calculated_size = -1;
+  let ntf_strings_calculated_size_desired = -1;
 
   function genStrings(items) {
     let result = [];
@@ -441,11 +444,44 @@
     "Connected to a sketchy site...",
     "Someone airdropped me malware."]);
 
+  const nft_marker_good = [
+    '✅',
+    '📈',
+    '🔺',
+    '📊',
+    '🧪',
+    '✨',
+    '🔮',
+    '🛸',
+    '💵',
+    '💰',
+    '⛓️',
+    '🚀'
+  ];
+
+  const nft_marker_bad = [
+    '❌',
+    '📉',
+    '🔻',
+    '⛓️',
+    '📊'
+  ];
+
+  const nft_marker_fail = [
+    '😭',
+    '🤡',
+    '📦',
+    '💀',
+    '🔥'
+  ];
+
   class NftBro extends BasicPoint {
 
-    constructor() {
+    constructor(index) {
       super();
       this.randomize();
+      this.index = index;
+      this.bubble = -1;
     }
 
     randomize() {
@@ -461,6 +497,8 @@
       // Left or right side?
       this.direction = MG.common.randomInt(0, 1);
       this.limit = 0;
+      this.bubble = -1;
+      this.speed = MG.common.randomInt(35, 75);
     }
 
   }
@@ -501,6 +539,20 @@
 
   }
 
+  class NftMarker extends BasicPoint {
+
+    constructor() {
+      super();
+      this.reset();
+    }
+
+    reset() {
+      this.timer = 10;
+      this.text = '';
+    }
+
+  }
+
   /**
    * Simple Bouncing Box
    */
@@ -520,6 +572,7 @@
 
       this.bros = [];
       this.bubbles = [];
+      this.marks = [];
       this.explosions = [];
       this.grinder = new NftGrinder();
 
@@ -527,15 +580,18 @@
       this.release_side = 0;
 
       for (let i = 0; i < 10; i++) {
-        this.bros.push(new NftBro());
+        this.bros.push(new NftBro(i));
       }
 
       for (let i = 0; i < 10; i++) {
-        this.bubbles.push(new TextBubble());
+        this.bubbles.push(new TextBubble(i));
       }
 
       for (let i = 0; i < 20; i++) {
         this.explosions.push(new NftExplosion());
+      }
+      for (let i = 0; i < 40; i++) {
+        this.marks.push(new NftMarker());
       }
     }
 
@@ -579,7 +635,15 @@
       this.fire_offset_y_mode = 0;
       this.fire_offset_timer = 0;
       this.fire_count = Math.floor(canvasWidth / 128.0) + 1;
+      this.mark_timer = 3;
+      this.bro_max_time = Math.floor(canvasWidth / 70.0) - 1;
 
+      if (canvasHeight > 1024) {
+        ntf_strings_calculated_size_desired = 2;
+      } else {
+        ntf_strings_calculated_size_desired = 1;
+      }
+      ntf_strings_calculated_size_desired = 1;
     }
 
     getTextBubble() {
@@ -592,6 +656,34 @@
       return undefined;
     }
 
+    getMarker() {
+      for (let item of this.marks) {
+        if (item.enabled == false) {
+          item.enabled = true;
+          return item;
+        }
+      }
+      return undefined;
+    }
+
+    issueMarker(bro, isTrending, isFalling) {
+      let mark = this.getMarker();
+      if (mark) {
+        let source;
+        if (isFalling) {
+          source = nft_marker_fail;
+        } else if (isTrending) {
+          source = nft_marker_good;
+        } else {
+          source = nft_marker_bad;
+        }
+        mark.text = source[MG.common.randomInt(0, source.length)];
+        mark.x = bro.x;
+        mark.y = bro.y + 64;
+        mark.timer = 10;
+      }
+    }
+
     issueTextForBro(bro, stringSource, mode = 0, yRise = 0) {
       let bubble = this.getTextBubble();
       if (bubble) {
@@ -599,6 +691,7 @@
         bubble.text = text_item.t;
         bubble.text_width = text_item.w;
         bubble.mode = mode;
+        bubble.speed = bro.speed;
 
         if (mode == 0) {
           if (bro.direction === 0) {
@@ -607,11 +700,13 @@
             bubble.x = bro.x - bubble.text_width - 10;
           }
           bubble.yRise = yRise;
-          bubble.y = bro.y + 48;
+          bubble.y = bro.y + (ntf_strings_calculated_size_desired === 1 ? 52 : 48);
         } else {
           bubble.x = bro.x - Math.floor(bubble.text_width / 2.0) + 64;
           bubble.y = bro.y;
         }
+        bubble.bro = bro.index;
+        bro.bubble = bubble.index;
         bubble.direction = bro.direction;
         bubble.timer = 4;
       }
@@ -689,7 +784,30 @@
 
     }
 
+    silenceBubble(bro) {
+      if (bro.bubble != -1 && this.bubbles[bro.bubble].bro === bro.index) {
+        this.bubbles[bro.bubble].enabled = false;
+        bro.bubble = -1;
+      }
+    }
+
     update(diffSec) {
+
+      let leave_marks = false;
+      this.mark_timer -= diffSec;
+      if (this.mark_timer < 0.0) {
+        this.mark_timer = 3;
+        leave_marks = true;
+      }
+
+      for (let mark of this.marks) {
+        if (mark.enabled) {
+          mark.timer -= diffSec;
+          if (mark.timer < 0) {
+            mark.enabled = false;
+          }
+        }
+      }
 
       // Fire Movement Logic
       this.fire_offset_timer += diffSec;
@@ -765,10 +883,11 @@
         } else {
 
           for (var bro of this.bros) {
-            if (bro.enabled === true && MG.common.arePointsClose(bro.x, bro.y, this.grinder.x, this.grinder.y, 700)) {
+            if (bro.enabled === true && MG.common.arePointsClose(bro.x, bro.y, this.grinder.x, this.grinder.y, 450)) {
               this.grinder.phase = 2;
               bro.phase = 200;
               this.grinder.bro = bro;
+              this.silenceBubble(bro);
               break;
             }
           }
@@ -776,7 +895,7 @@
 
         }
       } else if (this.grinder.phase === 2) {
-        if (!MG.common.moveTowardPoint(this.grinder.x + 68, this.grinder.y - 64, this.grinder.bro.x, this.grinder.bro.y, diffSec, 100, this.grinder.bro)) {
+        if (!MG.common.moveTowardPoint(this.grinder.x + 68, this.grinder.y - 64, this.grinder.bro.x, this.grinder.bro.y, diffSec, 300, this.grinder.bro)) {
           this.grinder.phase = 3;
           this.createExplodedProfileSet(this.img_hexes, this.grinder.bro.profile_background, 2, this.grinder.x + 32, this.grinder.y + 128);
           this.createExplodedProfileSet(this.img_sad, this.grinder.bro.profile_image, 2, this.grinder.x + 32, this.grinder.y + 128);
@@ -794,6 +913,8 @@
           this.createExplodedJunk(this.img_chunks, MG.common.randomInt(0, 5), this.grinder.x + 32, this.grinder.y + 128);
           this.createExplodedJunk(this.img_chunks, MG.common.randomInt(0, 5), this.grinder.x + 32, this.grinder.y + 128);
           this.grinder.timer = 0.45;
+        } else if (leave_marks) {
+          this.issueMarker(this.grinder.bro, false, true);
         }
       } else if (this.grinder.phase === 3) {
         this.grinder.timer -= diffSec;
@@ -837,12 +958,13 @@
           bubble.timer -= diffSec;
           if (bubble.timer < 0) {
             bubble.enabled = false;
+            bubble.bro = -1;
           } else {
             if (bubble.mode === 0) {
               if (bubble.direction == 0) {
-                bubble.x += 30 * diffSec;
+                bubble.x += bubble.speed * diffSec;
               } else {
-                bubble.x -= 30 * diffSec;
+                bubble.x -= bubble.speed * diffSec;
               }
               bubble.y += bubble.yRise * diffSec;
             } else {
@@ -857,7 +979,12 @@
       this.release_timer += diffSec;
       let release = false;
 
+
       for (let bro of this.bros) {
+
+        if (bro.enabled === true) {
+
+        }
 
         if (bro.phase == 0) { // Travel phase
           bro.delay -= diffSec;
@@ -870,7 +997,7 @@
             // They are active
             bro.phase = 100;
             bro.enabled = true;
-            bro.delay = MG.common.randomInt(30, 60);
+            bro.delay = MG.common.randomInt(Math.floor(this.bro_max_time / 4.0), this.bro_max_time);
             if (bro.direction == 0) {
               // Left side
               bro.x = -128;
@@ -883,12 +1010,12 @@
         } else if (bro.phase == 100) {
           let escaped = false;
           if (bro.direction == 0) {
-            bro.x += 40 * diffSec;
+            bro.x += bro.speed * diffSec;
             if (bro.x > 0) {
               escaped = true;
             }
           } else {
-            bro.x -= 40 * diffSec;
+            bro.x -= bro.speed * diffSec;
             if (bro.x < this.canvasWidth - 128) {
               escaped = true;
             }
@@ -903,11 +1030,14 @@
 
         } else if (bro.phase == 1) { // Travel phase
 
+          if (leave_marks) {
+            this.issueMarker(bro, bro.trend, false);
+          }
 
           if (bro.direction == 0) {
-            bro.x += 30 * diffSec;
+            bro.x += bro.speed * diffSec;
           } else {
-            bro.x -= 30 * diffSec;
+            bro.x -= bro.speed * diffSec;
           }
 
           bro.timer += diffSec;
@@ -947,9 +1077,13 @@
 
 
           if (bro.direction == 0) {
-            bro.x += 30 * diffSec;
+            bro.x += bro.speed * diffSec;
           } else {
-            bro.x -= 30 * diffSec;
+            bro.x -= bro.speed * diffSec;
+          }
+
+          if (leave_marks) {
+            this.issueMarker(bro, false, true);
           }
 
           bro.timer += diffSec;
@@ -959,11 +1093,11 @@
 
           if (bro.y > this.canvasHeight - 80) {
             bro.phase = 3;
+            this.silenceBubble(bro);
             this.issueTextForBro(bro, ntf_strings_zero, 1, 0);
           }
 
         } else if (bro.phase == 3) { // Falling Phase
-
           bro.y += 70 * diffSec;
 
           if (bro.y > this.canvasHeight) {
@@ -977,11 +1111,15 @@
 
     draw(ctx) {
 
-      ctx.font = "32px Sans-serif";
+      if (ntf_strings_calculated_size_desired === 1) {
+        ctx.font = "24px Sans-serif";
+      } else {
+        ctx.font = "32px Sans-serif";
+      }
 
       // One time setup
-      if (ntf_strings_calculated === false) {
-        ntf_strings_calculated = true;
+      if (ntf_strings_calculated_size === -1 || ntf_strings_calculated_size_desired !== ntf_strings_calculated_size) {
+        ntf_strings_calculated_size = ntf_strings_calculated_size_desired;
         for (let item of ntf_strings_winning) {
           item.w = ctx.measureText(item.t).width;
         }
@@ -1002,6 +1140,13 @@
         }
         for (let item of ntf_strings_money) {
           item.w = ctx.measureText(item.t).width;
+        }
+      }
+
+      // Explosions
+      for (let item of this.marks) {
+        if (item.enabled === true) {
+          ctx.fillText(item.text, item.x, item.y);
         }
       }
 
@@ -1047,13 +1192,13 @@
         if (bubble.enabled === true) {
 
           ctx.fillStyle = "white";
-          ctx.fillRect(bubble.x, bubble.y, bubble.text_width + 6, 36);
+          ctx.fillRect(bubble.x, bubble.y, bubble.text_width + 6, ntf_strings_calculated_size_desired === 1 ? 24 : 36);
 
           ctx.strokeStyle = "grey";
-          ctx.strokeRect(bubble.x, bubble.y, bubble.text_width + 6, 36);
+          ctx.strokeRect(bubble.x, bubble.y, bubble.text_width + 6, ntf_strings_calculated_size_desired === 1 ? 24 : 36);
 
           ctx.fillStyle = "black";
-          ctx.fillText(bubble.text, bubble.x + 3, bubble.y + 33);
+          ctx.fillText(bubble.text, bubble.x + 3, bubble.y + (ntf_strings_calculated_size_desired === 1 ? 21 : 33));
         }
       }
 
