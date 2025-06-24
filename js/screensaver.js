@@ -54,7 +54,8 @@ $(function () {
     const sizeLookup = {
         "sd": [12, 4, 12, 24, 32, 40],
         "dvd": [1, 1, 2, 6, 12, 24],
-        "box": [1, 1, 2, 6, 12, 24]
+        "box": [1, 1, 2, 6, 12, 24],
+        "nftbros": [1, 1, 1, 1, 1, 1]
     }
 
     function init() {
@@ -77,6 +78,8 @@ $(function () {
             for (let i = 0; i < itemCount; i++) {
                 items.push(new MG.clz.BouncingBox(MG.common.canvas));
             }
+        } else if (type === 'nftbros') {
+            items.push(new MG.clz.NftBros(MG.common.canvas));
         }
 
         MG.common.items = items;

@@ -22,7 +22,7 @@
     MG.common.width = 100;
     MG.common.height = 100;
 
-    MG.common.resize = function() {
+    MG.common.resize = function () {
         MG.common.width = MG.common.canvas.width = window.innerWidth;
         MG.common.height = MG.common.canvas.height = window.innerHeight;
     }
@@ -45,50 +45,123 @@
         MG.common.animationFrame = requestAnimationFrame(MG.common.drawMethod);
     };
 
-    MG.common.resetForChange = function() {
+    function getImageByName(image_name) {
+        if (imageMap[image_name]) {
+            return imageMap[image_name];
+        } else {
+            let img = new Image();
+            img.src = image_name;
+            imageMap[image_name] = img;
+            return img;
+        }
+    }
 
+    MG.common.resetForChange = function () {
+        // Make sure everything is resized
         MG.common.resize();
-
+        // Make sure the items have images
         for (const item of MG.common.items) {
             item.reset(MG.common.width, MG.common.height);
             image_name = item.requestImage();
             if (image_name) {
-                if (imageMap[image_name]) {
-                    item.acceptImage(imageMap[image_name]);
-                } else {
-                    let img = new Image();
-                    img.src = image_name;
-                    imageMap[image_name] = img;
-                    item.acceptImage(img);
+                item.acceptImage(getImageByName(image_name));
+            } else {
+                image_names = item.requestImages();
+                if (image_names && image_names.length > 0) {
+                    for (const image_name of image_names) {
+                        item.acceptImageWithName(getImageByName(image_name), image_name);
+                    }
                 }
             }
         }
     }
 
     MG.common.startDrawing = function () {
-        //canvas.style.display = 'block';
-        //panel.style.display = 'none';
-
-        //MG.common.resize();
-
-        //allowExit = false;
-        //setTimeout(() => allowExit = true, 1000);
-
         MG.common.resetForChange();
-        
-
         MG.common.drawMethod();
+    };
+
+    MG.common.arePointsClose = function (x1, y1, x2, y2, maxDistance = 128) {
+        let off;
+        if (x1 > x2) {
+            off = x1 - x2;
+        } else {
+            off = x2 - x1;
+        }
+        if (off > maxDistance)
+            return false;
+
+        if (y1 > y2) {
+            off = y1 - y2;
+        } else {
+            off = y2 - y1;
+        }
+        if (off > maxDistance)
+            return false;
+        return true;
+
+        //const dx = x2 - x1;
+        //const dy = y2 - y1;
+        //const distanceSquared = dx * dx + dy * dy;
+        //return distanceSquared <= maxDistance * maxDistance;
+    };
+
+    MG.common.moveTowardPoint = function (x1, y1, x2, y2, timeInSeconds, distancePerSecond, resultObj) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < (distancePerSecond / 4)) {
+            // Already at the target
+            resultObj.x = x1;
+            resultObj.y = y1;
+            return false;
+        }
+
+        const travelDistance = timeInSeconds * distancePerSecond;
+        const t = Math.min(travelDistance / distance, 1); // Clamp to max 1 (don't overshoot)
+
+        let xOff = dx * t;
+        let yOff = dy * t;
+
+        resultObj.x = x2 - xOff;
+        resultObj.y = y2 - yOff;
+
+        return true;
+    };
+
+    MG.common.updateExplodingChunk = function (obj, deltaTimeSeconds) {
+        const gravity = 400; // pixels per second^2
+        const drag = 0.98;   // slows down horizontal speed a bit (fake air resistance)
+
+        // If no velocity yet, initialize from degree + speed
+        if (obj.vx === undefined || obj.vy === undefined) {
+            const rad = (obj.degree * Math.PI) / 180;
+            obj.vx = Math.cos(rad) * obj.speed;
+            obj.vy = Math.sin(rad) * -obj.speed; // negative because 0 is top of screen
+        }
+
+        // Apply gravity
+        obj.vy += gravity * deltaTimeSeconds;
+
+        // Apply drag to vx (optional)
+        obj.vx *= drag;
+
+        // Update position
+        obj.x += obj.vx * deltaTimeSeconds;
+        obj.y += obj.vy * deltaTimeSeconds;
     };
 
 }());
 
 $(function () {
-
+    // Reset everything when the screen resizes
     $(window).resize(function () {
+        // Get the size info
         MG.common.resize();
+        // Reset each item
         for (const item of MG.common.items) {
             item.reset(MG.common.width, MG.common.height);
         }
     });
-
 });

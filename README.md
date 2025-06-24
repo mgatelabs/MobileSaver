@@ -2,5 +2,5 @@
 
 Webpage that will act as a screen saver and keep the device from sleeping.
 
--- Quick Access
+==Quick Access
 https://mgatelabs.github.io/MobileSaver/
