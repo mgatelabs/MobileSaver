@@ -643,7 +643,6 @@
       } else {
         ntf_strings_calculated_size_desired = 1;
       }
-      ntf_strings_calculated_size_desired = 1;
     }
 
     getTextBubble() {
