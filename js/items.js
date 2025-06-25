@@ -994,7 +994,7 @@
             this.release_side = (this.release_side + 1) % 2;
             release = true;
             // They are active
-            bro.phase = 100;
+            bro.phase = 100; // Escaping
             bro.enabled = true;
             bro.delay = MG.common.randomInt(Math.floor(this.bro_max_time / 4.0), this.bro_max_time);
             if (bro.direction == 0) {
@@ -1006,7 +1006,7 @@
             }
             bro.y = MG.common.randomInt(0, this.canvasHeight - 196);
           }
-        } else if (bro.phase == 100) {
+        } else if (bro.phase == 100) { // Escaping
           let escaped = false;
           if (bro.direction == 0) {
             bro.x += bro.speed * diffSec;
@@ -1035,8 +1035,14 @@
 
           if (bro.direction == 0) {
             bro.x += bro.speed * diffSec;
+            if (bro.x + 128 > this.canvasWidth) {
+              bro.direction = 1;
+            }
           } else {
             bro.x -= bro.speed * diffSec;
+            if (bro.x < 0) {
+              bro.direction = 0;
+            }
           }
 
           bro.timer += diffSec;
@@ -1072,13 +1078,19 @@
             bro.trend = false;
           }
 
-        } else if (bro.phase == 2) { // Travel phase
+        } else if (bro.phase == 2) { // Falling phase
 
 
           if (bro.direction == 0) {
             bro.x += bro.speed * diffSec;
+            if (bro.x + 128 > this.canvasWidth) {
+              bro.direction = 1;
+            }
           } else {
             bro.x -= bro.speed * diffSec;
+            if (bro.x < 0) {
+              bro.direction = 0;
+            }
           }
 
           if (leave_marks) {
