@@ -51,6 +51,39 @@ window.livelyPropertyListener = function (name, val) {
 
 $(function () {
 
+    // Check if a passed in version was sent in
+    const hash = window.location.hash.toUpperCase(); // Normalize case
+
+    if (hash === "#STEAMDECK") {
+        console.log("Steam Deck mode activated!");
+        contentType = 0;
+    } else if (hash === "#EXTREMESTEAMDECK") {
+        console.log("Extreme Steam Deck mode activated!");
+        contentType = 0;
+        itemCount = 52;
+    } else if (hash === "#DVD") {
+        console.log("Dvd mode activated!");
+        contentType = 1;
+        itemCount = 1;
+    } else if (hash === "#DVDS") {
+        console.log("Dvd 3 mode activated!");
+        contentType = 1;
+        itemCount = 3;
+    } else if (hash === "#BOX") {
+        console.log("Box mode activated!");
+        contentType = 2;
+        itemCount = 1;
+    } else if (hash === "#BOXES") {
+        console.log("Boxes mode activated!");
+        contentType = 2;
+        itemCount = 3;
+    } else if (hash === "#NFT") {
+        console.log("NFT mode activated!");
+        contentType = 3;
+    } else {
+        console.log("No recognized hash found.");
+    }
+
     window.MG = window.MG || {};
     const MG = window.MG;
 
