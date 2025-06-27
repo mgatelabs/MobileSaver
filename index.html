@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Flying Steam Deck: Screen Saver And Keep Awake</title>
+  <title>NoSleep Web App - Flying Steam Decks And More</title>
   <script src="./lib/jquery-3.7.1.slim.min.js"></script>
   <link rel="stylesheet" href="./css/screensaver.css">
 
@@ -36,11 +36,12 @@
 
     <div id="controls">
 
-      <div class="label">Display Type</div>
+      <div class="label">Display Mode</div>
 
       <button class="mode-choice selected" mode="sd" title="Flying Steam Decks" description="An homage to the classic 'Flying Toasters' screensaver — Steam Decks with wings soar across the screen."><img src="./images/preview_fsd.webp"></button>
       <button class="mode-choice" mode="dvd" title="DVD Video" description="Multiple bouncing 'DVD Video' logos that change color on bounce. A nostalgic throwback."><img src="./images/preview_dvdlogo.webp"></button>
       <button class="mode-choice" mode="box" title="Bouncing Box" description="A configurable number of colorful boxes bounce endlessly, reminiscent of old screensavers."><img src="./images/preview_boxes.webp"></button>
+      <button class="mode-choice" mode="lines" title="Lines" description="A configurable number of colorful lines sweep across the screen endlessly."><img src="./images/preview_lines.webp"></button>
       <button class="mode-choice" mode="nftbros" title="NFT Bros (Satire)" description="A satirical crypto/NFT screensaver."><img src="./images/preview_nft.webp"></button>
 
       <br />
@@ -52,11 +53,12 @@
         <option value="sd" selected>Flying Steam Deck</option>
         <option value="dvd">DVD Video</option>
         <option value="box">Boxes</option>
+        <option value="lines">Lines</option>
         <option value="nftbros">NFT/Crypto Bros</option>
       </select>
 
       <div id="crowd-selection">
-        <div class="label">Crowd Size</div>
+        <div class="label">Crowd/Density Configuration</div>
         <select id="screenSaverCrowd">
           <option value="d" selected>Default</option>
           <option value="s">Small</option>
@@ -82,6 +84,9 @@
         </li>
         <li>
           <a href="./wallpaper.html#BOX">Box</a>, <a href="./wallpaper.html#BOXES">(3)</a>
+        </li>
+        <li>
+          <a href="./wallpaper.html#LINE">Line</a>, <a href="./wallpaper.html#LINES">(3)</a>, <a href="./wallpaper.html#LINESPLUS">(10)</a>
         </li>
         <li>
           <a href="./wallpaper.html#NFT">NFT/Crypto Bros</a>

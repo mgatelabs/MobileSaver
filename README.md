@@ -28,6 +28,9 @@ An homage to the classic **Flying Toasters** screensaver — Steam Decks with wi
 ### 📦 Bouncing Box
 A configurable number of colorful boxes bounce endlessly, reminiscent of old screensavers.
 
+### ➡️ Lines
+A configurable number of colorful lines sweep across your screen.
+
 ### 💿 DVD Video
 Multiple bouncing **DVD Video** logos that change color on bounce. A nostalgic throwback.
 

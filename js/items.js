@@ -5,6 +5,23 @@
   window.MG.clz = window.MG.cls || {};
   const MG = window.MG;
 
+  /**
+   * Basic point for general tracking
+   */
+  class BasicPoint {
+
+    constructor() {
+      this.x = 0;
+      this.y = 0;
+      this.rotation = 0;
+      this.timer = 0;
+      this.delay = 0;
+      this.enabled = false;
+      this.phase = 0;
+    }
+
+  }
+
   // Define the base class
   MG.clz.BaseBox = class {
     constructor(canvas, w, h) {
@@ -90,6 +107,92 @@
     draw(ctx) {
       ctx.fillStyle = MG.common.colors[this.colorIndex];
       ctx.fillRect(this.x, this.y, this.w, this.h);
+    }
+
+  }
+
+  /**
+   * Simple Bouncing Box
+   */
+
+  MG.clz.FallingLines = class extends MG.clz.BaseBox {
+
+    constructor(canvas) {
+      super(canvas, 200, 200);
+    }
+
+    reset(canvasWidth = 0, canvasHeight = 0) {
+      super.reset(canvasWidth, canvasHeight);
+      this.delay = MG.common.randomInt(4, 64) / 4.0;
+      this.colorIndex = MG.common.randomInt(0, MG.common.colors.length - 1);
+      this.speed = MG.common.randomInt(25, 150);
+      this.girth = MG.common.randomInt(1, 15);
+      this.direction = MG.common.randomInt(0, 3);
+      this.enabled = false;
+      switch (this.direction) {
+        case 0:
+          this.y = 0 - this.girth;
+          break;
+        case 1:
+          this.y = this.canvasHeight + this.girth;
+          break;
+        case 2:
+          this.x = 0 - this.girth;
+          break;
+        case 3:
+          this.x = this.canvasWidth + this.girth;
+          break;
+      }
+    }
+
+    update(diffSec) {
+
+      this.delay -= diffSec;
+      if (this.delay > 0) {
+        return;
+      } else {
+        this.enabled = true;
+      }
+
+      let inBound = false;
+
+      switch (this.direction) {
+        case 0:
+          this.y += this.speed * diffSec;
+          inBound = this.y < this.canvasHeight;
+          break;
+        case 1:
+          this.y -= this.speed * diffSec;
+          inBound = this.y + this.girth > 0;
+          break;
+        case 2:
+          this.x += this.speed * diffSec;
+          inBound = this.x < this.canvasWidth;
+          break;
+        case 3:
+          this.x -= this.speed * diffSec;
+          inBound = this.x + this.girth > 0;
+          break;
+      }
+
+      if (!inBound) {
+        this.reset();
+      }
+    }
+
+    draw(ctx) {
+      ctx.fillStyle = MG.common.colors[this.colorIndex];
+      switch (this.direction) {
+        case 0:
+        case 1:
+          ctx.fillRect(0, this.y, this.canvasWidth, this.girth);
+          break;
+        case 2:
+        case 3:
+          ctx.fillRect(this.x, 0, this.girth, this.canvasHeight);
+          break;
+      }
+      
     }
 
   }
@@ -256,24 +359,6 @@
         }
       }
     }
-  }
-
-
-  /**
-   * Basic point for general tracking
-   */
-  class BasicPoint {
-
-    constructor() {
-      this.x = 0;
-      this.y = 0;
-      this.rotation = 0;
-      this.timer = 0;
-      this.delay = 0;
-      this.enabled = false;
-      this.phase = 0;
-    }
-
   }
 
   /**

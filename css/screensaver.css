@@ -61,3 +61,11 @@ canvas {
 .mode-choice.selected {
   background-color: lime;
 }
+
+.mode-choice:focus {
+  background-color: darkgrey;
+}
+
+.mode-choice.selected:focus {
+  background-color: darkgreen;
+}

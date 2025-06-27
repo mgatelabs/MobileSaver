@@ -2,7 +2,7 @@
     "ContentType": {
       "text": "Content Type",
       "type": "dropdown",
-      "items": ["Steam Decks", "DVD Video", "Blocks", "NFT Bros"],
+      "items": ["Steam Decks", "DVD Video", "Blocks", "NFT Bros", "Lines"],
       "value": 0
     },
     "ItemCount": {

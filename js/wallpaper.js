@@ -16,12 +16,12 @@ function init() {
         for (let i = 0; i < itemCount; i++) {
             items.push(new MG.clz.DvdLogo(MG.common.canvas, 0));
         }
-    } else if (contentType == 2) {
-        for (let i = 0; i < itemCount; i++) {
-            items.push(new MG.clz.BouncingBox(MG.common.canvas, 0));
-        }
     } else if (contentType == 3) {
         items.push(new MG.clz.NftBros(MG.common.canvas));
+    }  else if (contentType == 4) {
+        for (let i = 0; i < itemCount; i++) {
+            items.push(new MG.clz.FallingLines(MG.common.canvas));
+        }
     }
 
     MG.common.items = items;
@@ -77,6 +77,18 @@ $(function () {
         console.log("Boxes mode activated!");
         contentType = 2;
         itemCount = 3;
+    } else if (hash === "#LINE") {
+        console.log("Lines mode activated!");
+        contentType = 4;
+        itemCount = 1;
+    } else if (hash === "#LINES") {
+        console.log("Lines mode activated!");
+        contentType = 4;
+        itemCount = 3;
+    } else if (hash === "#LINESPLUS") {
+        console.log("Lines mode activated!");
+        contentType = 4;
+        itemCount = 10;
     } else if (hash === "#NFT") {
         console.log("NFT mode activated!");
         contentType = 3;

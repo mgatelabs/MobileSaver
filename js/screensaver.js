@@ -55,6 +55,7 @@ $(function () {
         "sd": [12, 4, 12, 24, 32, 40],
         "dvd": [1, 1, 2, 6, 12, 24],
         "box": [1, 1, 2, 6, 12, 24],
+        "lines": [1, 1, 2, 6, 12, 24],
         "nftbros": [1, 1, 1, 1, 1, 1]
     }
 
@@ -77,6 +78,10 @@ $(function () {
         } else if (type === 'box') {
             for (let i = 0; i < itemCount; i++) {
                 items.push(new MG.clz.BouncingBox(MG.common.canvas));
+            }
+        } else if (type === 'lines') {
+            for (let i = 0; i < itemCount; i++) {
+                items.push(new MG.clz.FallingLines(MG.common.canvas));
             }
         } else if (type === 'nftbros') {
             items.push(new MG.clz.NftBros(MG.common.canvas));
