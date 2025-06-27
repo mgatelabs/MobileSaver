@@ -151,6 +151,46 @@ $(function () {
         }
     });
 
+    function updateDisplayInfo() {
+        let element = $('.mode-choice.selected');
+        $('#display_title').text(element.attr('title'));
+        $('#display_description').text(element.attr('description'));
+    }
+
+    let last_display = localStorage.getItem('last_display');
+    if (last_display) {
+        $('#screenSaverType').val(last_display);
+    }
+
+    let current_type = $('#screenSaverType').val();
+    if (current_type !== 'sd') {
+        $('.mode-choice').removeClass('selected');
+        $('.mode-choice').each(function(){
+            let a = $(this);
+            if (a.attr('mode') == current_type) {
+                a.addClass('selected');
+                return false;
+            }
+        });
+        updateDisplayInfo();
+    }
+
+    $('.mode-choice').click(function () {
+        var $a = $(this), mode = $a.attr('mode');
+        $('.mode-choice').removeClass('selected');
+        $a.addClass('selected');
+        $('#screenSaverType').val(mode);
+        localStorage.setItem('last_display', mode);
+        if (mode === 'nftbros') {
+            $('#crowd-selection').hide();
+        } else {
+            $('#crowd-selection').show();
+        }
+        updateDisplayInfo();
+    });
+
+    updateDisplayInfo();
+
     document.addEventListener("fullscreenchange", () => {
         if (!document.fullscreenElement) {
             stopScreensaver();

@@ -30,32 +30,45 @@
 <body>
 
   <div id="button-panel">
-    <h1>Steam Deck Screen Saver / Keep Awake App</h1>
+    <h1>NoSleep Web App</h1>
     <h3>By Michael Fuller</h3>
-    <h4><a href="https://github.com/mgatelabs/MobileSaver">Source Code</a></h4>
+    <h4><a href="https://github.com/mgatelabs/MobileSaver">Source Code / Readme</a></h4>
 
     <div id="controls">
 
-      <div class="label">Screensaver Type</div>
-      <select id="screenSaverType">
+      <div class="label">Display Type</div>
+
+      <button class="mode-choice selected" mode="sd" title="Flying Steam Decks" description="An homage to the classic 'Flying Toasters' screensaver — Steam Decks with wings soar across the screen."><img src="./images/preview_fsd.webp"></button>
+      <button class="mode-choice" mode="dvd" title="DVD Video" description="Multiple bouncing 'DVD Video' logos that change color on bounce. A nostalgic throwback."><img src="./images/preview_dvdlogo.webp"></button>
+      <button class="mode-choice" mode="box" title="Bouncing Box" description="A configurable number of colorful boxes bounce endlessly, reminiscent of old screensavers."><img src="./images/preview_boxes.webp"></button>
+      <button class="mode-choice" mode="nftbros" title="NFT Bros (Satire)" description="A satirical crypto/NFT screensaver."><img src="./images/preview_nft.webp"></button>
+
+      <br />
+
+      <h3 id="display_title"></h3>
+      <blockquote id="display_description"></blockquote>
+
+      <select id="screenSaverType" style="display: none;">
         <option value="sd" selected>Flying Steam Deck</option>
         <option value="dvd">DVD Video</option>
         <option value="box">Boxes</option>
         <option value="nftbros">NFT/Crypto Bros</option>
       </select>
 
-      <div class="label">Crowd Size</div>
-      <select id="screenSaverCrowd">
-        <option value="d" selected>Default</option>
-        <option value="s">Small</option>
-        <option value="m">Medium</option>
-        <option value="l">Large</option>
-        <option value="xl">X-Large</option>
-        <option value="xxl">XX-Large</option>
-      </select>
+      <div id="crowd-selection">
+        <div class="label">Crowd Size</div>
+        <select id="screenSaverCrowd">
+          <option value="d" selected>Default</option>
+          <option value="s">Small</option>
+          <option value="m">Medium</option>
+          <option value="l">Large</option>
+          <option value="xl">X-Large</option>
+          <option value="xxl">XX-Large</option>
+        </select>
+      </div>
 
       <div>
-        <button id="start">Start Screen/Awake Saver</button>
+        <button id="start" class="start">Keep Awake</button>
       </div>
 
       <h4>Wallpaper Versions</h4>
