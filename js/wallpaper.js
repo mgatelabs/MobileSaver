@@ -16,6 +16,10 @@ function init() {
         for (let i = 0; i < itemCount; i++) {
             items.push(new MG.clz.DvdLogo(MG.common.canvas, 0));
         }
+    } else if (contentType == 2) {
+        for (let i = 0; i < itemCount; i++) {
+            items.push(new MG.clz.BouncingBox(MG.common.canvas));
+        }
     } else if (contentType == 3) {
         items.push(new MG.clz.NftBros(MG.common.canvas));
     }  else if (contentType == 4) {
