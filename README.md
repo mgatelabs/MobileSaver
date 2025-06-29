@@ -25,14 +25,22 @@ Pick from a variety of animated modes:
 ### 🕹️ Flying Steam Decks
 An homage to the classic **Flying Toasters** screensaver — Steam Decks with wings soar across the screen.
 
+![image](https://github.com/user-attachments/assets/e89af56c-48ec-4695-9c30-ac5427bc522e)
+
 ### 📦 Bouncing Box
 A configurable number of colorful boxes bounce endlessly, reminiscent of old screensavers.
+
+![image](https://github.com/user-attachments/assets/53b34a4a-0b8f-4e7b-80b9-d58b54d9b1a8)
 
 ### ➡️ Lines
 A configurable number of colorful lines sweep across your screen.
 
+![image](https://github.com/user-attachments/assets/4b5edcb9-f2e1-4933-ba29-5fe23fa08672)
+
 ### 💿 DVD Video
 Multiple bouncing **DVD Video** logos that change color on bounce. A nostalgic throwback.
+
+![image](https://github.com/user-attachments/assets/f2a29534-2876-49e3-8a85-d0f919b89f8c)
 
 ### 🔥 NFT Bros (Satire)
 A satirical crypto/NFT screensaver:
@@ -40,6 +48,8 @@ A satirical crypto/NFT screensaver:
 - Some burn into smoke.
 - Others get ground up by meme-inspired grinders.
 - Quotes and reactions from stereotypical crypto bros appear as chaos unfolds.
+
+![image](https://github.com/user-attachments/assets/805e0575-930d-4a76-b67e-9dd4deadc025)
 
 ---
 
@@ -94,5 +104,11 @@ These varients will not keep your system from sleeping, they just run in the win
 [BOX](https://mgatelabs.github.io/MobileSaver/wallpaper.html#BOX)
 
 [BOXES](https://mgatelabs.github.io/MobileSaver/wallpaper.html#BOXES)
+
+[LINE](https://mgatelabs.github.io/MobileSaver/wallpaper.html#LINE)
+
+[LINES](https://mgatelabs.github.io/MobileSaver/wallpaper.html#LINES)
+
+[LINES PLUS](https://mgatelabs.github.io/MobileSaver/wallpaper.html#LINESPLUS)
 
 [NFT Bros](https://mgatelabs.github.io/MobileSaver/wallpaper.html#NFT)
