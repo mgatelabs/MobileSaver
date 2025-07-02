@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>In The Pipe 5x5 Screensaver</title>
+  <script src="./lib/jquery-3.7.1.slim.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+  <script type="importmap">
+	{
+	  "imports": {
+		"three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+		"three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+	  }
+	}
+	</script>
+</head>
+
+<body>
+  <canvas id="screen" style="display: none;"></canvas>
+  <script src="./js/common.js"></script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+
+    $(function () {
+
+      const mainScene = new THREE.Scene();
+      const mainCamera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+      //var canvReference = document.getElementById("screen");
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      /*
+      const orthoScene = new THREE.Scene();
+      const orthoCamera = new THREE.OrthographicCamera(
+        -1, 1, 1, -1, 0, 1 // Normalized screen space
+      );
+  
+      const overlayMaterial = new THREE.MeshBasicMaterial({
+        color: 0x1D80DE,
+        transparent: true,
+        opacity: 0.4,
+      });
+      const overlayHorPlanes = [];
+      overlayHorPlanes.push(new THREE.Mesh(new THREE.PlaneGeometry(1, 1), overlayMaterial));
+      overlayHorPlanes.push(new THREE.Mesh(new THREE.PlaneGeometry(1, 1), overlayMaterial));
+      overlayHorPlanes.push(new THREE.Mesh(new THREE.PlaneGeometry(1, 1), overlayMaterial));
+  
+      for (let p of overlayHorPlanes) {
+        orthoScene.add(p);
+      }
+  
+      function updateOrthoDisplay() {
+        const camFactor = 2;
+        orthoCamera.left = -window.innerWidth / camFactor;
+        orthoCamera.right = window.innerWidth / camFactor;
+        orthoCamera.top = window.innerHeight / camFactor;
+        orthoCamera.bottom = -window.innerHeight / camFactor;
+        orthoCamera.updateProjectionMatrix();
+  
+        for (let p of overlayHorPlanes) {
+          p.scale.x = window.innerWidth;
+          p.scale.y = 4;
+        }
+  
+        overlayHorPlanes[0].position.y =  (window.innerHeight / 2) - 2;
+        overlayHorPlanes[1].position.y =  (window.innerHeight / 2) - 40;
+      }
+      updateOrthoDisplay();
+      */
+
+
+      const composer = new EffectComposer(renderer);
+      composer.addPass(new RenderPass(mainScene, mainCamera));
+      //const overlayPass = new RenderPass(orthoScene, orthoCamera);
+      //overlayPass.clear = false; // Do NOT clear color/depth — preserves previous rendering
+      composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.1, 0.3));
+
+      const planetGeometry = new THREE.SphereGeometry(5, 32, 32);
+
+      // mesh
+      var insideMaterial = new THREE.MeshPhongMaterial({
+        color: 0xff0000,
+        polygonOffset: true,
+        polygonOffsetFactor: 1, // positive value pushes polygon further away
+        polygonOffsetUnits: 1
+      });
+      var insideMesh = new THREE.Mesh(planetGeometry, insideMaterial);
+      insideMesh.position.set(0, 0, 0);
+      mainScene.add(insideMesh)
+
+      const wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0x71DE70, wireframe: true });
+      const planet_wireframe = new THREE.Mesh(planetGeometry, wireframeMaterial);
+      planet_wireframe.position.set(0, 0, 0);
+      mainScene.add(planet_wireframe);
+
+      const numPatches = 30;
+      const r = 5.0; // Planet radius
+      const patches = [];
+      //const patchMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
+      const patchMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+      const patchGeometry = new THREE.PlaneGeometry(0.25, 0.25);
+
+      // Create once
+      for (let i = 0; i < numPatches; i++) {
+        const patchMesh = new THREE.Mesh(patchGeometry, patchMaterial);
+        patches.push(patchMesh);
+        planet_wireframe.add(patchMesh);
+      }
+
+      function placePatches() {
+        for (let i = 0; i < patches.length; i++) {
+          const patch = patches[i];
+
+          // phi = latitude, clamp to ±30°
+          const phi = (Math.random() * 50 - 25) * (Math.PI / 180); // -30° to +30°
+          const theta = Math.random() * Math.PI * 2;
+
+          const x = r * Math.cos(phi) * Math.cos(theta);
+          const y = r * Math.sin(phi);
+          const z = r * Math.cos(phi) * Math.sin(theta);
+
+          patch.position.set(x, y, z);
+
+          // Align to surface so plane lies flat (Z-axis points outward)
+          const normal = new THREE.Vector3(x, y, z).normalize();
+          const zAxis = new THREE.Vector3(0, 0, 1);
+          const quaternion = new THREE.Quaternion().setFromUnitVectors(zAxis, normal);
+          patch.setRotationFromQuaternion(quaternion);
+        }
+      }
+      placePatches();
+
+      const gate_depth = 0.01;
+      const gate_width = 0.5;
+      const gate_thickness = 0.005;
+
+      /**
+       * Create a Gate
+       */
+      function createGate(cubeMaterial) {
+        var group = new THREE.Group();
+
+        const topCube = new THREE.Mesh(new THREE.BoxGeometry(gate_width + (gate_thickness), gate_thickness, gate_depth), cubeMaterial);
+        const leftCube = new THREE.Mesh(new THREE.BoxGeometry(gate_thickness, gate_width - (gate_thickness), gate_depth), cubeMaterial);
+        const rightCube = new THREE.Mesh(new THREE.BoxGeometry(gate_thickness, gate_width - (gate_thickness), gate_depth), cubeMaterial);
+        const bottompCube = new THREE.Mesh(new THREE.BoxGeometry(gate_width + (gate_thickness), gate_thickness, gate_depth), cubeMaterial);
+
+        topCube.position.set(0, gate_width / 2, 0);
+        leftCube.position.set(-gate_width / 2, 0.0, 0);
+        rightCube.position.set(gate_width / 2, 0.0, 0);
+        bottompCube.position.set(0, -gate_width / 2, 0);
+
+        group.add(topCube);
+        group.add(leftCube);
+        group.add(rightCube);
+        group.add(bottompCube);
+
+        return group;
+      }
+
+      const solidMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: false });
+      const wireFrameMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+      const cubes = [];
+      const cubesPerRing = 48;
+
+      const doublePi = Math.PI * 2;
+
+      const ringRadius = 5.75;
+      const ringHeight = 0;
+
+      for (let j = 0; j < cubesPerRing; j++) {
+        const angle = (j / cubesPerRing) * doublePi;
+        const cube = createGate(solidMaterial);
+        cube.position.set(
+          Math.cos(angle) * ringRadius,
+          ringHeight,
+          Math.sin(angle) * ringRadius
+        );
+        cube.rotation.y = -(Math.PI / 180) * ((j / cubesPerRing) * 360) + Math.PI;
+        cubes.push(cube);
+        mainScene.add(cube);
+      }
+
+
+      { // Invisible fake gate to align better
+        const angle = doublePi;
+        const cube = new THREE.Group();
+        cube.position.set(
+          Math.cos(angle) * ringRadius,
+          ringHeight,
+          Math.sin(angle) * ringRadius
+        );
+        cubes.push(cube);
+      }
+
+      function rollGatesPath(startIndex, endIndex, rollAmplitude = Math.PI / 2, frequency = 1) {
+        for (let i = startIndex + 1; i < endIndex; i++) {
+          const gate = cubes[i];
+          if (!gate) continue;
+
+          const t = (i - startIndex) / (endIndex - startIndex);
+          const smoothFactor = Math.sin(t * Math.PI * frequency);
+          gate.rotation.z = smoothFactor * rollAmplitude;
+        }
+      }
+
+      function swayGatesPath(startIndex, endIndex, verticalAmplitude = 0.5, frequency = 1) {
+        for (let i = startIndex + 1; i < endIndex; i++) {
+          const gate = cubes[i];
+          if (!gate) continue;
+
+          const t = (i - startIndex) / (endIndex - startIndex);
+          const smoothFactor = Math.sin(t * Math.PI * frequency);
+          gate.position.y += smoothFactor * verticalAmplitude;
+        }
+      }
+
+      function determineMaxRolAmplitude() {
+        let size = (Math.PI / 2) * ((Math.random() * 0.6) + 0.2);
+        return (Math.random() > 0.5) ? size : size * -1;
+      }
+
+      rollGatesPath(0, cubes.length - 8, determineMaxRolAmplitude());
+      swayGatesPath(0, cubes.length - 8);
+
+      mainCamera.position.x = cubes[0].position.x;
+      mainCamera.position.y = cubes[0].position.y;
+      mainCamera.position.z = cubes[0].position.z;
+
+      let current_ring_index = 0;
+      let next_ring_index = 1;
+      let ring_position = 0;
+
+      //let angle = 0;
+      let lastTime = 0;
+
+      const cameraState = {
+        position: new THREE.Vector3().copy(cubes[0].position),
+        rotation: new THREE.Euler(0, 0, 0, 'YXZ'), // Pitch/yaw/roll
+        quaternion: cubes[0].quaternion.clone(),
+        targetIndex: 1
+      };
+
+      const movementSpeed = 0.25; // units/frame
+      const rotationSpeed = 0.005; // interpolation factor
+      const switchDistance = 0.5; // how close before switching to next gate
+
+      function updateCameraMissile(fractionSecond) {
+        const currentTarget = cubes[cameraState.targetIndex];
+        const targetPos = currentTarget.position;
+
+        // --- Direction to target
+        const toTarget = new THREE.Vector3().subVectors(targetPos, cameraState.position).normalize();
+
+        const gateUp = new THREE.Vector3(0, 1, 0).applyEuler(currentTarget.rotation).normalize();
+
+        const lookMatrix = new THREE.Matrix4().lookAt(
+          cameraState.position,
+          targetPos,
+          gateUp
+        );
+
+        const desiredQuat = new THREE.Quaternion().setFromRotationMatrix(lookMatrix);
+
+        // --- Smooth rotation based on time
+        const rotationLerpSpeed = 0.5; // how fast it turns (radians/sec)
+        cameraState.quaternion.slerp(desiredQuat, Math.min(1, fractionSecond * rotationLerpSpeed));
+
+        // --- Move forward in current direction
+        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(cameraState.quaternion);
+        //const movementSpeed = 5.0; // units per second
+        cameraState.position.add(forward.multiplyScalar(movementSpeed * fractionSecond));
+
+        // --- Gate switch
+        if (cameraState.position.distanceTo(targetPos) < switchDistance) {
+          cameraState.targetIndex = (cameraState.targetIndex + 1) % cubes.length;
+          if (cameraState.targetIndex == cubes.length - 8) {
+            rollGatesPath(0, cubes.length - 8, determineMaxRolAmplitude());
+            swayGatesPath(0, cubes.length - 8);
+            placePatches();
+          }
+        }
+
+        // --- Apply to Three.js camera
+        mainCamera.position.copy(cameraState.position);
+        mainCamera.quaternion.copy(cameraState.quaternion);
+      }
+
+      function animate(currentTime) {
+
+        const deltaTime = currentTime - lastTime;
+        let msDiff = deltaTime / 1000.0;
+        if (isNaN(msDiff) || msDiff < 0.01) {
+          msDiff = 0.01;
+        }
+        lastTime = currentTime;
+
+        updateCameraMissile(msDiff);
+
+        composer.render();
+
+        MG.common.animationFrame = requestAnimationFrame(animate);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        mainCamera.aspect = window.innerWidth / window.innerHeight;
+        mainCamera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
+        //updateOrthoDisplay();
+      });
+
+
+      let allowExit = false;
+
+      async function enterFullscreen() {
+        try {
+          await document.documentElement.requestFullscreen();
+          await MG.common.requestWakeLock();
+        } catch (e) {
+          console.error("Failed to enter fullscreen:", e);
+          // Let it play on devices where you can't get exclusive lock
+
+        } finally {
+          startScreenSaver();
+        }
+      }
+
+      function exitFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          //stopScreensaver();
+        }
+      }
+
+      function startScreenSaver() {
+        allowExit = true;
+
+        MG.common.startCursorCycle();
+        MG.common.startDrawing();
+      }
+
+      function stopScreensaver() {
+
+        cancelAnimationFrame(MG.common.animationFrame);
+        MG.common.releaseWakeLock();
+        MG.common.stopCursorCycle();
+      }
+
+      $('body').click(function () {
+        if (allowExit) {
+          allowExit = false;
+          exitFullscreen();
+        } else {
+          if (!document.fullscreenElement) {
+            enterFullscreen();
+          }
+        }
+      });
+
+      document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) {
+          stopScreensaver();
+        }
+      });
+
+    });
+  </script>
+</body>
+
+</html>

@@ -152,6 +152,55 @@
         obj.y += obj.vy * deltaTimeSeconds;
     };
 
+    // Cursor magic
+
+    let cursorIndex = 0;
+
+    const cursors = [
+        "default", "pointer", "crosshair", "wait",
+        "text", "move", "progress", "not-allowed"
+    ];
+
+    let cursorInterval = undefined;
+
+    MG.common.startCursorCycle = function () {
+        cursorInterval = setInterval(() => {
+            cursorIndex = (cursorIndex + 1) % cursors.length;
+            MG.common.canvas.style.cursor = cursors[cursorIndex];
+        }, 3000); // change every 3 seconds
+    };
+
+    MG.common.stopCursorCycle = function () {
+        clearInterval(cursorInterval);
+        MG.common.canvas.style.cursor = "default";
+    };
+
+    // Wake lock
+
+    let wakeLock = null;
+    MG.common.requestWakeLock = async function () {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => {
+                    console.log('Wake Lock released');
+                });
+                console.log('Wake Lock active');
+            } else {
+                console.warn('Wake Lock not supported');
+            }
+        } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+        }
+    };
+
+    MG.common.releaseWakeLock = function () {
+        if (wakeLock) {
+            wakeLock.release();
+            wakeLock = null;
+        }
+    };
+
 }());
 
 $(function () {

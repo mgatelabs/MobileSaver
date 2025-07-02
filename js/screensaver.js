@@ -1,46 +1,6 @@
 $(function () {
 
     let allowExit = false;
-    let wakeLock = null;
-
-    // Cursor magic
-
-    let cursorIndex = 0;
-
-    const cursors = [
-        "default", "pointer", "crosshair", "wait",
-        "text", "move", "progress", "not-allowed"
-    ];
-
-    function startCursorCycle() {
-        cursorInterval = setInterval(() => {
-            cursorIndex = (cursorIndex + 1) % cursors.length;
-            MG.common.canvas.style.cursor = cursors[cursorIndex];
-        }, 3000); // change every 3 seconds
-    }
-
-    function stopCursorCycle() {
-        clearInterval(cursorInterval);
-        MG.common.canvas.style.cursor = "default";
-    }
-
-    // Keep the screen awake
-
-    async function requestWakeLock() {
-        try {
-            if ('wakeLock' in navigator) {
-                wakeLock = await navigator.wakeLock.request('screen');
-                wakeLock.addEventListener('release', () => {
-                    console.log('Wake Lock released');
-                });
-                console.log('Wake Lock active');
-            } else {
-                console.warn('Wake Lock not supported');
-            }
-        } catch (err) {
-            console.error(`${err.name}, ${err.message}`);
-        }
-    }
 
     const sizeChartLookup = {
         "d": 0,
@@ -93,7 +53,7 @@ $(function () {
     async function enterFullscreen() {
         try {
             await document.documentElement.requestFullscreen();
-            await requestWakeLock();
+            await MG.common.requestWakeLock();
         } catch (e) {
             console.error("Failed to enter fullscreen:", e);
             // Let it play on devices where you can't get exclusive lock
@@ -111,13 +71,6 @@ $(function () {
         }
     }
 
-    function releaseWakeLock() {
-        if (wakeLock) {
-            wakeLock.release();
-            wakeLock = null;
-        }
-    }
-
     function startScreenSaver() {
 
         $('#button-panel').hide();
@@ -129,7 +82,7 @@ $(function () {
         // Wait 1 Second
         setTimeout(() => allowExit = true, 1000);
 
-        startCursorCycle();
+        MG.common.startCursorCycle();
 
         MG.common.startDrawing();
     }
@@ -138,9 +91,9 @@ $(function () {
 
         cancelAnimationFrame(MG.common.animationFrame);
         MG.common.canvas.style.display = 'none';
-        releaseWakeLock();
+        MG.common.releaseWakeLock();
 
-        stopCursorCycle();
+        MG.common.stopCursorCycle();
 
         $('#button-panel').show();
         $('#screen').hide();
@@ -170,7 +123,7 @@ $(function () {
     let current_type = $('#screenSaverType').val();
     if (current_type !== 'sd') {
         $('.mode-choice').removeClass('selected');
-        $('.mode-choice').each(function(){
+        $('.mode-choice').each(function () {
             let a = $(this);
             if (a.attr('mode') == current_type) {
                 a.addClass('selected');
