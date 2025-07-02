@@ -5,11 +5,17 @@
     window.MG.common = window.MG.common || {};
     const MG = window.MG;
 
-    MG.common.canvas = document.getElementById("screen");
-    MG.common.ctx = MG.common.canvas.getContext("2d");
+    MG.common.canvas = undefined;
+    MG.common.ctx = undefined;
+    
     MG.common.colors = ["lime", "red", "blue", "yellow", "magenta", "cyan", "white", "orange"];
     MG.common.items = [];
     MG.common.animationFrame = undefined;
+
+    MG.common.init = function (is2d = true) {
+        MG.common.canvas = document.getElementById("screen");
+        MG.common.ctx = is2d ? MG.common.canvas.getContext && MG.common.canvas.getContext("2d") || undefined : undefined;
+    };
 
     let lastTime = 0;
 

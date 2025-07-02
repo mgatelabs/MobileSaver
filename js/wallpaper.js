@@ -103,6 +103,8 @@ $(function () {
     window.MG = window.MG || {};
     const MG = window.MG;
 
+    MG.common.init();
+
     init();
 
     started = true;

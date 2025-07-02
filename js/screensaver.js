@@ -154,4 +154,6 @@ $(function () {
             stopScreensaver();
         }
     });
+
+    MG.common.init();
 });
